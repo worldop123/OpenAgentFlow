@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAgentFlow - AI Agent 工作流平台</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-robot"></i>
+                <span>OpenAgentFlow</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i> 仪表板
+                </a>
+                <a href="#agents" class="nav-link">
+                    <i class="fas fa-user-robot"></i> AI Agent
+                </a>
+                <a href="#workflows" class="nav-link">
+                    <i class="fas fa-project-diagram"></i> 工作流
+                </a>
+                <a href="#tools" class="nav-link">
+                    <i class="fas fa-tools"></i> 工具集成
+                </a>
+                <a href="#docs" class="nav-link">
+                    <i class="fas fa-book"></i> 文档
+                </a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-primary" onclick="createNewWorkflow()">
+                    <i class="fas fa-plus"></i> 创建工作流
+                </button>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 仪表板 -->
+        <section id="dashboard" class="section active">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-tachometer-alt"></i> 仪表板</h1>
+                <p>欢迎使用 OpenAgentFlow - 可组合的 AI Agent 工作流平台</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-robot"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="agent-count">0</h3>
+                        <p>AI Agent</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="workflow-count">0</h3>
+                        <p>工作流</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="execution-count">0</h3>
+                        <p>执行记录</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="tool-count">0</h3>
+                        <p>集成工具</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <h2><i class="fas fa-bolt"></i> 快速操作</h2>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="showSection('agents')">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>创建 AI Agent</span>
+                    </button>
+                    <button class="action-btn" onclick="showSection('workflows')">
+                        <i class="fas fa-sitemap"></i>
+                        <span>设计工作流</span>
+                    </button>
+                    <button class="action-btn" onclick="testAPI()">
+                        <i class="fas fa-vial"></i>
+                        <span>测试 API</span>
+                    </button>
+                    <button class="action-btn" onclick="openDocs()">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>查看教程</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="recent-activity">
+                <h2><i class="fas fa-history"></i> 最近活动</h2>
+                <div class="activity-list" id="activity-list">
+                    <div class="activity-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Agent管理 -->
+        <section id="agents" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-user-robot"></i> AI Agent 管理</h1>
+                <button class="btn btn-primary" onclick="createNewAgent()">
+                    <i class="fas fa-plus"></i> 创建 Agent
+                </button>
+            </div>
+            
+            <div class="agent-list" id="agent-list">
+                <!-- Agent卡片将通过JS动态加载 -->
+            </div>
+            
+            <div class="agent-form" id="agent-form" style="display: none;">
+                <h3>创建新 Agent</h3>
+                <form id="agent-create-form">
+                    <div class="form-group">
+                        <label for="agent-name">Agent 名称</label>
+                        <input type="text" id="agent-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agent-description">描述</label>
+                        <textarea id="agent-description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agent-type">Agent 类型</label>
+                        <select id="agent-type">
+                            <option value="llm">LLM Agent (大语言模型)</option>
+                            <option value="tool">工具 Agent</option>
+                            <option value="condition">条件 Agent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agent-config">配置 (JSON)</label>
+                        <textarea id="agent-config" rows="6">{
+  "model": "gpt-3.5-turbo",
+  "temperature": 0.7,
+  "max_tokens": 1000
+}</textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cancelAgentForm()">取消</button>
+                        <button type="submit" class="btn btn-primary">创建 Agent</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 工作流设计器 -->
+        <section id="workflows" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-project-diagram"></i> 工作流设计器</h1>
+                <div class="workflow-actions">
+                    <button class="btn btn-secondary" onclick="loadSampleWorkflow()">
+                        <i class="fas fa-download"></i> 加载示例
+                    </button>
+                    <button class="btn btn-primary" onclick="saveWorkflow()">
+                        <i class="fas fa-save"></i> 保存工作流
+                    </button>
+                </div>
+            </div>
+            
+            <div class="workflow-container">
+                <div class="workflow-sidebar">
+                    <h3><i class="fas fa-shapes"></i> 节点库</h3>
+                    <div class="node-palette">
+                        <div class="node-item" draggable="true" data-type="start">
+                            <i class="fas fa-play-circle"></i>
+                            <span>开始节点</span>
+                        </div>
+                        <div class="node-item" draggable="true" data-type="llm">
+                            <i class="fas fa-brain"></i>
+                            <span>AI Agent</span>
+                        </div>
+                        <div class="node-item" draggable="true" data-type="tool">
+                            <i class="fas fa-tools"></i>
+                            <span>工具节点</span>
+                        </div>
+                        <div class="node-item" draggable="true" data-type="condition">
+                            <i class="fas fa-code-branch"></i>
+                            <span>条件节点</span>
+                        </div>
+                        <div class="node-item" draggable="true" data-type="end">
+                            <i class="fas fa-stop-circle"></i>
+                            <span>结束节点</span>
+                        </div>
+                    </div>
+                    
+                    <div class="workflow-properties">
+                        <h3><i class="fas fa-cog"></i> 属性</h3>
+                        <div id="node-properties">
+                            <p class="placeholder">选择一个节点进行配置</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="workflow-canvas-container">
+                    <div class="workflow-canvas" id="workflow-canvas">
+                        <div class="canvas-placeholder">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <p>从左侧拖拽节点到此处开始设计工作流</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="workflow-list">
+                <h3><i class="fas fa-list"></i> 工作流列表</h3>
+                <div class="workflow-items" id="workflow-items">
+                    <!-- 工作流列表将通过JS动态加载 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 工具集成 -->
+        <section id="tools" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-tools"></i> 工具集成</h1>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon feishu">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <h3>飞书 (Lark)</h3>
+                    <p>集成飞书消息、日程、多维表格等</p>
+                    <div class="tool-status">
+                        <span class="status-badge status-active">已连接</span>
+                    </div>
+                    <button class="btn btn-outline" onclick="configureFeishu()">
+                        <i class="fas fa-cog"></i> 配置
+                    </button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon dingtalk">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>钉钉</h3>
+                    <p>集成钉钉消息、机器人、审批等</p>
+                    <div class="tool-status">
+                        <span class="status-badge status-inactive">未连接</span>
+                    </div>
+                    <button class="btn btn-outline" onclick="configureDingtalk()">
+                        <i class="fas fa-cog"></i> 配置
+                    </button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon wecom">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>企业微信</h3>
+                    <p>集成企业微信消息、通讯录、应用等</p>
+                    <div class="tool-status">
+                        <span class="status-badge status-inactive">未连接</span>
+                    </div>
+                    <button class="btn btn-outline" onclick="configureWecom()">
+                        <i class="fas fa-cog"></i> 配置
+                    </button>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon custom">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>自定义工具</h3>
+                    <p>通过API集成自定义工具</p>
+                    <div class="tool-status">
+                        <span class="status-badge status-available">可用</span>
+                    </div>
+                    <button class="btn btn-outline" onclick="createCustomTool()">
+                        <i class="fas fa-plus"></i> 创建
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文档 -->
+        <section id="docs" class="section">
+            <div class="section-header">
+                <h1><i class="fas fa-book"></i> 文档与教程</h1>
+            </div>
+            
+            <div class="docs-grid">
+                <div class="doc-card">
+                    <h3><i class="fas fa-play-circle"></i> 快速开始</h3>
+                    <p>学习如何创建第一个AI Agent和工作流</p>
+                    <button class="btn btn-outline" onclick="openQuickStart()">
+                        开始学习 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="doc-card">
+                    <h3><i class="fas fa-code"></i> API 文档</h3>
+                    <p>查看完整的API接口文档和示例</p>
+                    <button class="btn btn-outline" onclick="openAPIDocs()">
+                        查看文档 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="doc-card">
+                    <h3><i class="fas fa-video"></i> 视频教程</h3>
+                    <p>观看视频教程学习高级功能</p>
+                    <button class="btn btn-outline" onclick="openVideoTutorials()">
+                        观看视频 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="doc-card">
+                    <h3><i class="fas fa-question-circle"></i> 常见问题</h3>
+                    <p>解决常见问题和故障排除</p>
+                    <button class="btn btn-outline" onclick="openFAQ()">
+                        查看FAQ <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-robot"></i>
+                <span>OpenAgentFlow</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/worldop123/OpenAgentFlow" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="#" onclick="showSection('docs')">
+                    <i class="fas fa-book"></i> 文档
+                </a>
+                <a href="#" onclick="showSection('tools')">
+                    <i class="fas fa-tools"></i> 工具
+                </a>
+            </div>
+            <div class="footer-copyright">
+                © 2026 OpenAgentFlow - 开源AI Agent工作流平台
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
